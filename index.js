@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 12;
 
 const app = express();
-const port = 3005;
+const port = process.env.PORT || 4000;
 
 const Joi = require("joi");
 
