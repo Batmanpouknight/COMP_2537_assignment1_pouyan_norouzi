@@ -48,7 +48,7 @@ app.use('/css', express.static(__dirname + '/public/css'));
 app.use('/html', express.static(__dirname + '/public/html'));
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/html/home.html');
+    res.sendFile(__dirname + '/public/html/index.html');
 });
 app.get('/home2', (req, res) => {
     res.sendFile(__dirname + '/public/html/homeLoggedIn.html');
