@@ -46,6 +46,7 @@ app.use(session({
 
 app.use('/css', express.static(__dirname + '/public/css'));
 app.use('/html', express.static(__dirname + '/public/html'));
+app.use('/img', express.static(__dirname + '/public/img'));
 
 app.get('/', async (req, res) => {
     if (req.session.authenticated) {
@@ -145,8 +146,13 @@ app.post('/loginSubmit', async (req, res) => {
 });
 
 app.get('/members', (req, res) => {
-    // res.sendFile(__dirname + '/public/html/members.html');
+    if (!req.session.authenticated) {
+        res.send("<h1>Unauthorized</h1> <a href='/'>Go back</a>")
+        return;
+    }
+    let catNum = Math.floor(Math.random() * 3) + 1;
     res.send("<h1>Welcome to the members page " + req.session.username + "</h1>" +
+    "<img src='/img/cat"+ catNum + ".jpg' style='height:20vw'></img>" +
     "<form action='/logout' method='get'>"+
         "<button type='submit'>Signout</button>"+
     "</form>" );
