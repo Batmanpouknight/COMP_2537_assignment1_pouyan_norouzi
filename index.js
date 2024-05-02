@@ -47,16 +47,21 @@ app.use(session({
 app.use('/css', express.static(__dirname + '/public/css'));
 app.use('/html', express.static(__dirname + '/public/html'));
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     if (req.session.authenticated) {
-        res.sendFile(__dirname + '/public/html/homeLoggedIn.html');
-        
+        // res.sendFile(__dirname + '/public/html/homeLoggedIn.html');
+        res.send("<h3>Hello " + req.session.username + "</h3>" +
+
+            "<form action='/members' method='get'>" +
+                "<button type='submit'>Go to members Area</button><br>" +
+            "</form>" +
+            "<form action='/logout' method='get'>" +
+                "<button type='submit'>Logout</button>" +
+            "</form>");
+        console.log(req.session.username);
         return;
     }
     res.sendFile(__dirname + '/public/html/index.html');
-});
-app.get('/home2', (req, res) => {
-    res.sendFile(__dirname + '/public/html/homeLoggedIn.html');
 });
 
 app.get('/signup', (req, res) => {
@@ -88,6 +93,10 @@ app.post('/signupSubmit', async (req, res) => {
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    req.session.authenticated = true;
+	req.session.username = username;
+	req.session.cookie.maxAge = expireTime;
+
     await userCollection.insertOne({username: username, email: email, password: hashedPassword});
 	console.log("Inserted user");
 
@@ -98,12 +107,53 @@ app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/public/html/login.html');
 });
 
+app.post('/loginSubmit', async (req, res) => {
+    var email = req.body.email;
+    var password = req.body.password;
+
+	const schema = Joi.string().email().required();
+	const validationResult = schema.validate(email);
+	if (validationResult.error != null) {
+	   //add stuff
+	   return;
+	}
+
+	const result = await userCollection.find({email: email}).project({email: 1, username: 1, password: 1, _id: 1}).toArray();
+
+    console.log(result);
+
+    if (result.length != 1) {
+		console.log("email is wrong");
+		res.send("<p>Email is wrong</p> <a href='/login'>try again</a>");
+		return;
+	}
+
+    if (await bcrypt.compare(password, result[0].password)) {
+		console.log("correct password");
+		req.session.authenticated = true;
+		req.session.username = result[0].username;
+		req.session.cookie.maxAge = expireTime;
+
+		res.redirect('/members');
+		return;
+	}
+	else {
+		console.log("Invalid email/password combination");
+		res.send("<p>Invalid email/password combination</p> <a href='/login'>try again</a>");
+		return;
+	}
+});
+
 app.get('/members', (req, res) => {
-    res.sendFile(__dirname + '/public/html/members.html');
+    // res.sendFile(__dirname + '/public/html/members.html');
+    res.send("<h1>Welcome to the members page " + req.session.username + "</h1>" +
+    "<form action='/logout' method='get'>"+
+        "<button type='submit'>Signout</button>"+
+    "</form>" );
 });
 
 app.get('/logout', (req, res) => {
-    // Perform logout logic here
+    req.session.destroy();
     res.redirect('/');
 });
 
