@@ -10,8 +10,14 @@
     <h3>Hello User</h3>
 
     <div>
-        <button onclick="signIn()">Go to members Area</button><br>
-        <button onclick="logIn()">Logout</button>
+        <form action="/members" method="get">
+            <button type="submit">Go to members Area</button><br>
+        </form>
+        <form action="/logout" method="get">
+            <button type="submit">Logout</button>
+        </form>
+
+
     </div>
 
 </body>

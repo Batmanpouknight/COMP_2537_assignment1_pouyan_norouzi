@@ -48,6 +48,11 @@ app.use('/css', express.static(__dirname + '/public/css'));
 app.use('/html', express.static(__dirname + '/public/html'));
 
 app.get('/', (req, res) => {
+    if (req.session.authenticated) {
+        res.sendFile(__dirname + '/public/html/homeLoggedIn.html');
+        
+        return;
+    }
     res.sendFile(__dirname + '/public/html/index.html');
 });
 app.get('/home2', (req, res) => {
@@ -72,8 +77,12 @@ app.post('/signupSubmit', async (req, res) => {
 
     const validationResult = schema.validate({ username, email, password });
     if (validationResult.error != null) {
-        console.log(validationResult.error);
-        res.redirect("/signup");
+        let html = "";
+        validationResult.error.details.forEach((error) => {
+            html += `<p>${error.message}</p>`;
+        });
+        html += "<a href='/signup'>try again</a>";
+        res.send(html);
         return;
     }
 
