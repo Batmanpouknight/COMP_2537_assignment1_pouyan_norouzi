@@ -69,7 +69,7 @@ app.get('/signup', (req, res) => {
     res.sendFile(__dirname + '/public/html/signup.html');
 });
 
-app.post('/signupSubmit', async (req, res) => {
+app.get('/signupSubmit', async (req, res) => {
     var username = req.body.name;
     var email = req.body.email;
     var password = req.body.password;
