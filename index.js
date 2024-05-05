@@ -115,7 +115,9 @@ app.post('/loginSubmit', async (req, res) => {
 	const schema = Joi.string().email().required();
 	const validationResult = schema.validate(email);
 	if (validationResult.error != null) {
-	   //add stuff
+	   validationResult.error.details.forEach((error) => {
+              res.send(`<p>${error.message}</p> <a href='/login'>try again</a>`);
+       });
 	   return;
 	}
 
