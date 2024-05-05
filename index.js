@@ -165,9 +165,13 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get("*", (req, res) => {
+app.get('/doesnotexist', (req, res) => {
     res.status(404);
-    res.send("Page not found - 404");
+    res.sendFile(__dirname + '/public/html/404.html');
+});
+
+app.get("*", (req, res) => {
+    res.redirect("/doesnotexist");
 })
 
 app.listen(port, () => {
